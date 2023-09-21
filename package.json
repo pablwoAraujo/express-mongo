@@ -1,0 +1,13 @@
+{
+  "name": "express-mongo",
+  "version": "1.0.0",
+  "description": "Curso de Node.js: criando uma API Rest com Express e MongoDB",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
