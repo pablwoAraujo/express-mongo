@@ -6,13 +6,17 @@ app.use(express.json());
 const livros = [
   {
     id: 1,
-    título: "O Senhor dos Anéis",
+    title: "O Senhor dos Anéis",
   },
   {
     id: 2,
-    título: "O Hobbit",
+    title: "O Hobbit",
   },
 ];
+
+function buscaLivro(id) {
+  return livros.findIndex((livro) => livro.id === Number(id));
+}
 
 app.get("/", (req, res) => {
   res
@@ -24,9 +28,20 @@ app.get("/livros", (req, res) => {
   res.status(200).json(livros);
 });
 
+app.get("/livros/:id", (req, res) => {
+  const index = buscaLivro(req.params.id);
+  res.status(200).json(livros[index]);
+});
+
 app.post("/livros", (req, res) => {
   livros.push(req.body);
   res.status(201).send("Livro cadastrado com sucesso");
+});
+
+app.put("/livros/:id", (req, res) => {
+  const index = buscaLivro(req.params.id);
+  livros[index].title = req.body.title;
+  res.status(201).json(livros);
 });
 
 export default app;
