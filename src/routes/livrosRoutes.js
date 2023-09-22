@@ -7,5 +7,6 @@ livrosRoutes.get("/livros", LivroController.listarLivros);
 livrosRoutes.get("/livros/:id", LivroController.listarLivroPorId);
 livrosRoutes.post("/livros", LivroController.cadastrarLivro);
 livrosRoutes.put("/livros/:id", LivroController.atualizarLivro);
+livrosRoutes.delete("/livros/:id", LivroController.excluirLivro);
 
 export default livrosRoutes;

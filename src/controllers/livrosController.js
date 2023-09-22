@@ -64,6 +64,26 @@ class LivroController {
       }
     }
   }
+
+  static async excluirLivro(req, res) {
+    try {
+      const id = req.params.id;
+      const livro = await livros.findByIdAndDelete(id);
+
+      if (livro === null) {
+        throw new NotFoundError("Livro não encontrado na base de dados");
+      }
+      res.status(200).json({ message: "livro excluído com sucesso" });
+    } catch (erro) {
+      if (erro instanceof NotFoundError) {
+        res.status(404).json({ message: `${erro.message}` });
+      } else {
+        res
+          .status(500)
+          .json({ message: `${erro.message} - falha na exclusão` });
+      }
+    }
+  }
 }
 
 export default LivroController;
