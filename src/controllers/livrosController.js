@@ -1,3 +1,4 @@
+import NotFoundError from "../error/NotFoundError.js";
 import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
 
@@ -29,7 +30,7 @@ class LivroController {
       if (livro !== null) {
         res.status(200).json(livro);
       } else {
-        res.status(404).json({ message: "Livro não encontrado na base de dados" });
+        next(new NotFoundError("Livro não encontrado na base de dados"));
       }
     } catch (erro) {
       next(erro);
@@ -61,9 +62,12 @@ class LivroController {
 
         const livroCriado = await livros.create(livroCompleto);
 
-        res.status(201).json({ message: "criado com sucesso", livro: livroCriado });
+        res.status(201).json({
+          message: "Livro cadastrado com sucesso.", 
+          livro: livroCriado
+        });
       } else {
-        res.status(404).json({ message: "Autor não encontrado na base de dados" });
+        next(new NotFoundError("Autor não encontrado na base de dados"));
       }
     } catch (erro) {
       next(erro);
@@ -79,7 +83,7 @@ class LivroController {
       if (livroAtualizado !== null) {
         res.status(200).json({ message: "livro atualizado", livroAtualizado });
       } else {
-        res.status(404).json({ message: "Livro não encontrado na base de dados" });
+        next(new NotFoundError("Livro não encontrado na base de dados"));
       }
     } catch (erro) {
       next(erro);
@@ -92,9 +96,9 @@ class LivroController {
       const livro = await livros.findByIdAndDelete(id);
 
       if (livro !== null) {
-        res.status(200).json({ message: "livro excluído com sucesso" });
+        res.status(200).json({ message: "livro removido com sucesso" });
       } else {
-        res.status(404).json({ message: "Livro não encontrado na base de dados" });
+        next(new NotFoundError("Livro não encontrado na base de dados"));
       }
     } catch (erro) {
       next(erro);

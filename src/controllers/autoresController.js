@@ -1,3 +1,4 @@
+import NotFoundError from "../error/NotFoundError.js";
 import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
 
@@ -18,8 +19,8 @@ class AutoresController {
 
       if (autor !== null) {
         res.status(200).json(autor);
-      }else{
-        res.status(404).json({ message: "Autor não encontrado na base de dados" });
+      } else {
+        next(new NotFoundError("Autor não encontrado na base de dados"));
       }
     } catch (erro) {
       next(erro);
@@ -57,7 +58,7 @@ class AutoresController {
         await atualizaAutorNosLivros(id, req.body.nacionalidade);
         res.status(200).json({ message: "Autor atualizado", autorAtualizado });
       } else {
-        res.status(404).json({ message: "Autor não encontrado na base de dados" });
+        next(new NotFoundError("Autor não encontrado na base de dados"));
       }
     } catch (erro) {
       next(erro);
@@ -72,7 +73,7 @@ class AutoresController {
       if (autor !== null) {
         res.status(200).json({ message: "autor excluído com sucesso" });
       } else {
-        res.status(404).json({ message: "Autor não encontrado na base de dados" });
+        next(new NotFoundError("Autor não encontrado na base de dados"));
       }
     } catch (erro) {
       next(erro);

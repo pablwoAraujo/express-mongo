@@ -1,13 +1,19 @@
 import mongoose from "mongoose";
+import BaseError from "../error/BaseError.js";
+import NotFoundError from "../error/NotFoundError.js";
+import BadRequestError from "../error/BadRequestError.js";
+import ValidationError from "../error/ValidationError.js";
 
 // eslint-disable-next-line no-unused-vars
 function middlewareErros(erro, req, res, next) {
-  if (erro instanceof mongoose.Error.CastError) {
-    res
-      .status(404)
-      .send({ message: "Um ou mais dados fornecidos estão incorretos." });
+  if (erro instanceof mongoose.Error.ValidationError) {
+    new ValidationError(erro).respond(res);
+  } else if (erro instanceof mongoose.Error.CastError) {
+    new BadRequestError().respond(res);
+  } else if (erro instanceof NotFoundError ) {
+    erro.respond(res);
   } else {
-    res.status(500).send({ message: "Erro interno do servidor." });
+    new BaseError().respond(res);
   }
 }
 
