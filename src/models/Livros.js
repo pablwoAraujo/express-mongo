@@ -9,9 +9,20 @@ const livrosSchema = new mongoose.Schema(
       type: String,
       required: [true, "O título do livro é obrigatório"],
     },
-    editora: { type: String },
+    editora: {
+      type: String,
+      required: [true, "A editora é obrigatória"],
+      enum: {
+        values: ["Casa do Código", "Alura"],
+        message: "A editora {VALUE} não esta cadastrada em nosso sistema.",
+      },
+    },
     preco: { type: Number },
-    paginas: { type: Number },
+    paginas: {
+      type: Number,
+      min: [1, "O Número de páginas deve estar entre 1 e 5000"],
+      max: [5000, "O Número de páginas deve estar entre 1 e 5000"],
+    },
     autor: autoresSchema,
   },
   { versionKey: false }
@@ -23,7 +34,7 @@ const livrosSchema = new mongoose.Schema(
 //   titulo: {
 //     type: String,
 //     required: [true, "O título do livro é obrigatório"],
-//   },  
+//   },
 //   editora: { type: String },
 //   preco: { type: Number },
 //   paginas: { type: Number },
