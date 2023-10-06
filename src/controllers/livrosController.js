@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import NotFoundError from "../error/notFoundError.js";
 import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
@@ -29,17 +30,16 @@ class LivroController {
       const id = req.params.id;
       const livro = await livros.findById(id);
 
-      if (livro === null) {
-        throw new NotFoundError("Livro não encontrado na base de dados");
-      }
-      res.status(200).json(livro);
-    } catch (erro) {
-      if (erro instanceof NotFoundError) {
-        res.status(404).json({ message: `${erro.message}` });
+      if (livro !== null) {
+        res.status(200).json(livro);
       } else {
-        res
-          .status(500)
-          .json({ message: `${erro.message} - falha na requisição do livro` });
+        res.status(404).json({ message: "Livro não encontrado na base de dados" });
+      }
+    } catch (erro) {
+      if (erro instanceof mongoose.Error.CastError) {
+        res.status(400).json({ message: "Um ou mais dados fornecidos estão incorretos." });
+      } else {
+        res.status(500).json({ message: `${erro.message} - falha na requisição do livro` });
       }
     }
   }

@@ -47,7 +47,6 @@ class AutoresController {
 
   atualizaAutorNosLivros = async (id, nacionalidade) => {
 
-    console.log("AAAAAAAAAAAAAAAA");
     if (nacionalidade !== null) {
       await livros.updateMany(
         { "autor._id": id },
