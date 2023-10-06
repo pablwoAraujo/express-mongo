@@ -47,7 +47,7 @@ class AutoresController {
 
   atualizaAutorNosLivros = async (id, nacionalidade) => {
 
-    console.log("AAAAAAAAAAAAAAAA")
+    console.log("AAAAAAAAAAAAAAAA");
     if (nacionalidade !== null) {
       await livros.updateMany(
         { "autor._id": id },
@@ -57,17 +57,10 @@ class AutoresController {
         }
       );
     }
-  }
-
-  teste = ()=>{
-    console.log("BBBBBBBBBBBBBB")
-  }
-  
+  };
 
   static async atualizarAutor(req, res) {
     const atualizaAutorNosLivros = async (id, nacionalidade) => {
-
-      console.log("AAAAAAAAAAAAAAAA")
       if (nacionalidade !== null) {
         await livros.updateMany(
           { "autor._id": id },
@@ -77,7 +70,7 @@ class AutoresController {
           }
         );
       }
-    }
+    };
 
     try {
       const id = req.params.id;
@@ -88,8 +81,7 @@ class AutoresController {
         throw new NotFoundError("Autor não encontrado na base de dados");
       }
 
-this.AutoresController.teste();
-      // await this.constructor.atualizaAutorNosLivros(id, req.body.nacionalidade);
+      await atualizaAutorNosLivros(id, req.body.nacionalidade);
 
       res.status(200).json({ message: "Autor atualizado", autorAtualizado });
     } catch (erro) {
