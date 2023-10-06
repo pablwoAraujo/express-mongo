@@ -1,4 +1,3 @@
-import NotFoundError from "../error/notFoundError.js";
 import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
 
@@ -17,10 +16,11 @@ class AutoresController {
       const id = req.params.id;
       const autor = await autores.findById(id);
 
-      if (autor === null) {
-        throw new NotFoundError("Autor não encontrado na base de dados");
+      if (autor !== null) {
+        res.status(200).json(autor);
+      }else{
+        res.status(404).json({ message: "Autor não encontrado na base de dados" });
       }
-      res.status(200).json(autor);
     } catch (erro) {
       next(erro);
     }
@@ -34,18 +34,6 @@ class AutoresController {
       next(erro);
     }
   }
-
-  atualizaAutorNosLivros = async (id, nacionalidade) => {
-    if (nacionalidade !== null) {
-      await livros.updateMany(
-        { "autor._id": id },
-
-        {
-          $set: { "autor.nacionalidade": nacionalidade },
-        }
-      );
-    }
-  };
 
   static async atualizarAutor(req, res, next) {
     const atualizaAutorNosLivros = async (id, nacionalidade) => {
@@ -65,13 +53,12 @@ class AutoresController {
       await autores.findByIdAndUpdate(id, req.body);
       const autorAtualizado = await autores.findById(id);
 
-      if (autorAtualizado === null) {
-        throw new NotFoundError("Autor não encontrado na base de dados");
+      if (autorAtualizado !== null) {
+        await atualizaAutorNosLivros(id, req.body.nacionalidade);
+        res.status(200).json({ message: "Autor atualizado", autorAtualizado });
+      } else {
+        res.status(404).json({ message: "Autor não encontrado na base de dados" });
       }
-
-      await atualizaAutorNosLivros(id, req.body.nacionalidade);
-
-      res.status(200).json({ message: "Autor atualizado", autorAtualizado });
     } catch (erro) {
       next(erro);
     }
@@ -82,10 +69,11 @@ class AutoresController {
       const id = req.params.id;
       const autor = await autores.findByIdAndDelete(id);
 
-      if (autor === null) {
-        throw new NotFoundError("Autor não encontrado na base de dados");
+      if (autor !== null) {
+        res.status(200).json({ message: "autor excluído com sucesso" });
+      } else {
+        res.status(404).json({ message: "Autor não encontrado na base de dados" });
       }
-      res.status(200).json({ message: "autor excluído com sucesso" });
     } catch (erro) {
       next(erro);
     }

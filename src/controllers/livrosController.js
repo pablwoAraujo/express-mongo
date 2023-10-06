@@ -1,4 +1,3 @@
-import NotFoundError from "../error/notFoundError.js";
 import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
 
@@ -30,9 +29,7 @@ class LivroController {
       if (livro !== null) {
         res.status(200).json(livro);
       } else {
-        res
-          .status(404)
-          .json({ message: "Livro não encontrado na base de dados" });
+        res.status(404).json({ message: "Livro não encontrado na base de dados" });
       }
     } catch (erro) {
       next(erro);
@@ -56,20 +53,18 @@ class LivroController {
     try {
       const autorEncontrado = await autores.findById(novoLivro.autor);
 
-      if (autorEncontrado === null) {
-        throw new NotFoundError("Autor não encontrado.");
+      if (autorEncontrado !== null) {
+        const livroCompleto = {
+          ...novoLivro,
+          autor: { ...autorEncontrado._doc },
+        };
+
+        const livroCriado = await livros.create(livroCompleto);
+
+        res.status(201).json({ message: "criado com sucesso", livro: livroCriado });
+      } else {
+        res.status(404).json({ message: "Autor não encontrado na base de dados" });
       }
-
-      const livroCompleto = {
-        ...novoLivro,
-        autor: { ...autorEncontrado._doc },
-      };
-
-      const livroCriado = await livros.create(livroCompleto);
-
-      res
-        .status(201)
-        .json({ message: "criado com sucesso", livro: livroCriado });
     } catch (erro) {
       next(erro);
     }
@@ -81,10 +76,11 @@ class LivroController {
       await livros.findByIdAndUpdate(id, req.body);
       const livroAtualizado = await livros.findById(id);
 
-      if (livroAtualizado === null) {
-        throw new NotFoundError("Livro não encontrado na base de dados");
+      if (livroAtualizado !== null) {
+        res.status(200).json({ message: "livro atualizado", livroAtualizado });
+      } else {
+        res.status(404).json({ message: "Livro não encontrado na base de dados" });
       }
-      res.status(200).json({ message: "livro atualizado", livroAtualizado });
     } catch (erro) {
       next(erro);
     }
@@ -95,10 +91,11 @@ class LivroController {
       const id = req.params.id;
       const livro = await livros.findByIdAndDelete(id);
 
-      if (livro === null) {
-        throw new NotFoundError("Livro não encontrado na base de dados");
+      if (livro !== null) {
+        res.status(200).json({ message: "livro excluído com sucesso" });
+      } else {
+        res.status(404).json({ message: "Livro não encontrado na base de dados" });
       }
-      res.status(200).json({ message: "livro excluído com sucesso" });
     } catch (erro) {
       next(erro);
     }
