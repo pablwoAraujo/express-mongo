@@ -14,10 +14,15 @@ const livrosSchema = new mongoose.Schema(
       required: [true, "A editora é obrigatória"],
       enum: {
         values: ["Casa do Código", "Alura"],
-        message: "A editora {VALUE} não esta cadastrada em nosso sistema.",
+        message: "A editora {VALUE} não esta cadastrada em nosso sistema",
       },
     },
-    preco: { type: Number },
+    preco: { type: Number, validate:{
+      validator: (value) => {
+        return value>0;
+      },
+      message: "O preço precisa ser maior que R$ 0,00"
+    }},
     paginas: {
       type: Number,
       min: [1, "O Número de páginas deve estar entre 1 e 5000"],
