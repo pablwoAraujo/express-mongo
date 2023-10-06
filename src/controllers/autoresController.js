@@ -3,18 +3,16 @@ import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
 
 class AutoresController {
-  static async listarAutores(req, res) {
+  static async listarAutores(req, res, next) {
     try {
       const listaAutores = await autores.find({});
       res.status(200).json(listaAutores);
     } catch (erro) {
-      res
-        .status(500)
-        .json({ message: `${erro.message} - falha na requisição` });
+      next(erro);
     }
   }
 
-  static async listarAutorPorId(req, res) {
+  static async listarAutorPorId(req, res, next) {
     try {
       const id = req.params.id;
       const autor = await autores.findById(id);
@@ -24,29 +22,20 @@ class AutoresController {
       }
       res.status(200).json(autor);
     } catch (erro) {
-      if (erro instanceof NotFoundError) {
-        res.status(404).json({ message: `${erro.message}` });
-      } else {
-        res
-          .status(500)
-          .json({ message: `${erro.message} - falha na requisição do autor ` });
-      }
+      next(erro);
     }
   }
 
-  static async cadastrarAutor(req, res) {
+  static async cadastrarAutor(req, res, next) {
     try {
       const novoAutor = await autores.create(req.body);
       res.status(201).json({ message: "criado com sucesso", autor: novoAutor });
     } catch (erro) {
-      res
-        .status(500)
-        .json({ message: `${erro.message} - falha ao cadastrar autor ` });
+      next(erro);
     }
   }
 
   atualizaAutorNosLivros = async (id, nacionalidade) => {
-
     if (nacionalidade !== null) {
       await livros.updateMany(
         { "autor._id": id },
@@ -58,12 +47,12 @@ class AutoresController {
     }
   };
 
-  static async atualizarAutor(req, res) {
+  static async atualizarAutor(req, res, next) {
     const atualizaAutorNosLivros = async (id, nacionalidade) => {
       if (nacionalidade !== null) {
         await livros.updateMany(
           { "autor._id": id },
-  
+
           {
             $set: { "autor.nacionalidade": nacionalidade },
           }
@@ -84,19 +73,11 @@ class AutoresController {
 
       res.status(200).json({ message: "Autor atualizado", autorAtualizado });
     } catch (erro) {
-      if (erro instanceof NotFoundError) {
-        res.status(404).json({ message: `${erro.message}` });
-      } else {
-        res
-          .status(500)
-          .json({ message: `${erro.message} - falha na atualização` });
-      }
+      next(erro);
     }
   }
 
- 
-
-  static async excluirAutor(req, res) {
+  static async excluirAutor(req, res, next) {
     try {
       const id = req.params.id;
       const autor = await autores.findByIdAndDelete(id);
@@ -106,13 +87,7 @@ class AutoresController {
       }
       res.status(200).json({ message: "autor excluído com sucesso" });
     } catch (erro) {
-      if (erro instanceof NotFoundError) {
-        res.status(404).json({ message: `${erro.message}` });
-      } else {
-        res
-          .status(500)
-          .json({ message: `${erro.message} - falha na exclusão` });
-      }
+      next(erro);
     }
   }
 }

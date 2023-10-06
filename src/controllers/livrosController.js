@@ -1,18 +1,15 @@
-import mongoose from "mongoose";
 import NotFoundError from "../error/notFoundError.js";
 import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
 
 class LivroController {
   // formato embedding
-  static async listarLivros(req, res) {
+  static async listarLivros(req, res, next) {
     try {
       const listaLivros = await livros.find({});
       res.status(200).json(listaLivros);
     } catch (erro) {
-      res
-        .status(500)
-        .json({ message: `${erro.message} - falha na requisição` });
+      next(erro);
     }
   }
   // formato referencing
@@ -25,7 +22,7 @@ class LivroController {
   //   }
   // };
 
-  static async listarLivroPorId(req, res) {
+  static async listarLivroPorId(req, res, next) {
     try {
       const id = req.params.id;
       const livro = await livros.findById(id);
@@ -33,29 +30,27 @@ class LivroController {
       if (livro !== null) {
         res.status(200).json(livro);
       } else {
-        res.status(404).json({ message: "Livro não encontrado na base de dados" });
+        res
+          .status(404)
+          .json({ message: "Livro não encontrado na base de dados" });
       }
     } catch (erro) {
-      if (erro instanceof mongoose.Error.CastError) {
-        res.status(400).json({ message: "Um ou mais dados fornecidos estão incorretos." });
-      } else {
-        res.status(500).json({ message: `${erro.message} - falha na requisição do livro` });
-      }
+      next(erro);
     }
   }
 
-  static async buscarLivrosPorEditora(req, res) {
+  static async buscarLivrosPorEditora(req, res, next) {
     const editora = req.query.editora;
 
     try {
       const livrosPorEditora = await livros.find({ editora });
       res.status(200).json(livrosPorEditora);
     } catch (erro) {
-      res.status(500).json({ message: `${erro.message} - falha na busca` });
+      next(erro);
     }
   }
 
-  static async cadastrarLivro(req, res) {
+  static async cadastrarLivro(req, res, next) {
     const novoLivro = req.body;
 
     try {
@@ -76,17 +71,11 @@ class LivroController {
         .status(201)
         .json({ message: "criado com sucesso", livro: livroCriado });
     } catch (erro) {
-      if (erro instanceof NotFoundError) {
-        res.status(404).json(erro.message);
-      } else {
-        res
-          .status(500)
-          .json({ message: `${erro.message} - falha ao cadastrar livro` });
-      }
+      next(erro);
     }
   }
 
-  static async atualizarLivro(req, res) {
+  static async atualizarLivro(req, res, next) {
     try {
       const id = req.params.id;
       await livros.findByIdAndUpdate(id, req.body);
@@ -97,17 +86,11 @@ class LivroController {
       }
       res.status(200).json({ message: "livro atualizado", livroAtualizado });
     } catch (erro) {
-      if (erro instanceof NotFoundError) {
-        res.status(404).json({ message: `${erro.message}` });
-      } else {
-        res
-          .status(500)
-          .json({ message: `${erro.message} - falha na atualização` });
-      }
+      next(erro);
     }
   }
 
-  static async excluirLivro(req, res) {
+  static async excluirLivro(req, res, next) {
     try {
       const id = req.params.id;
       const livro = await livros.findByIdAndDelete(id);
@@ -117,13 +100,7 @@ class LivroController {
       }
       res.status(200).json({ message: "livro excluído com sucesso" });
     } catch (erro) {
-      if (erro instanceof NotFoundError) {
-        res.status(404).json({ message: `${erro.message}` });
-      } else {
-        res
-          .status(500)
-          .json({ message: `${erro.message} - falha na exclusão` });
-      }
+      next(erro);
     }
   }
 }
