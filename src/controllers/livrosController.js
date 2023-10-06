@@ -1,6 +1,6 @@
 import NotFoundError from "../error/NotFoundError.js";
-import { autores } from "../models/Autores.js";
-import livros from "../models/Livros.js";
+import { autores } from "../models/index.js";
+import { livros } from "../models/index.js";
 
 class LivroController {
   // formato embedding
