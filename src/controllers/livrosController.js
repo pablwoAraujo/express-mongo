@@ -3,6 +3,7 @@ import { autores } from "../models/Autores.js";
 import livros from "../models/Livros.js";
 
 class LivroController {
+  // formato embedding
   static async listarLivros(req, res) {
     try {
       const listaLivros = await livros.find({});
@@ -13,6 +14,15 @@ class LivroController {
         .json({ message: `${erro.message} - falha na requisição` });
     }
   }
+  // formato referencing
+  // static async listarLivros (req, res) {
+  //   try {
+  //     const listaLivros = await livros.find({}).populate("autor").exec();
+  //     res.status(200).json(listaLivros);
+  //   } catch (erro) {
+  //     res.status(500).json({ message: `${erro.message} - falha na requisição` });
+  //   }
+  // };
 
   static async listarLivroPorId(req, res) {
     try {

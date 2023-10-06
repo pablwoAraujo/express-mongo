@@ -1,5 +1,6 @@
 import NotFoundError from "../error/notFoundError.js";
 import { autores } from "../models/Autores.js";
+import livros from "../models/Livros.js";
 
 class AutoresController {
   static async listarAutores(req, res) {
@@ -21,7 +22,7 @@ class AutoresController {
       if (autor === null) {
         throw new NotFoundError("Autor não encontrado na base de dados");
       }
-      res.status(200).json(autor );
+      res.status(200).json(autor);
     } catch (erro) {
       if (erro instanceof NotFoundError) {
         res.status(404).json({ message: `${erro.message}` });
@@ -36,7 +37,7 @@ class AutoresController {
   static async cadastrarAutor(req, res) {
     try {
       const novoAutor = await autores.create(req.body);
-      res.status(201).json({ message: "criado com sucesso", autor : novoAutor });
+      res.status(201).json({ message: "criado com sucesso", autor: novoAutor });
     } catch (erro) {
       res
         .status(500)
@@ -44,7 +45,40 @@ class AutoresController {
     }
   }
 
+  atualizaAutorNosLivros = async (id, nacionalidade) => {
+
+    console.log("AAAAAAAAAAAAAAAA")
+    if (nacionalidade !== null) {
+      await livros.updateMany(
+        { "autor._id": id },
+
+        {
+          $set: { "autor.nacionalidade": nacionalidade },
+        }
+      );
+    }
+  }
+
+  teste = ()=>{
+    console.log("BBBBBBBBBBBBBB")
+  }
+  
+
   static async atualizarAutor(req, res) {
+    const atualizaAutorNosLivros = async (id, nacionalidade) => {
+
+      console.log("AAAAAAAAAAAAAAAA")
+      if (nacionalidade !== null) {
+        await livros.updateMany(
+          { "autor._id": id },
+  
+          {
+            $set: { "autor.nacionalidade": nacionalidade },
+          }
+        );
+      }
+    }
+
     try {
       const id = req.params.id;
       await autores.findByIdAndUpdate(id, req.body);
@@ -53,6 +87,10 @@ class AutoresController {
       if (autorAtualizado === null) {
         throw new NotFoundError("Autor não encontrado na base de dados");
       }
+
+this.AutoresController.teste();
+      // await this.constructor.atualizaAutorNosLivros(id, req.body.nacionalidade);
+
       res.status(200).json({ message: "Autor atualizado", autorAtualizado });
     } catch (erro) {
       if (erro instanceof NotFoundError) {
@@ -64,6 +102,8 @@ class AutoresController {
       }
     }
   }
+
+ 
 
   static async excluirAutor(req, res) {
     try {
