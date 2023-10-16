@@ -4,28 +4,29 @@ import { livros } from "../models/index.js";
 
 class LivroController {
   // formato embedding
+  // static async listarLivros(req, res, next) {
+  //   try {
+  //     const listaLivros = await livros.find({});
+  //     res.status(200).json(listaLivros);
+  //   } catch (erro) {
+  //     next(erro);
+  //   }
+  // }
+
+  // formato referencing
   static async listarLivros(req, res, next) {
     try {
-      const listaLivros = await livros.find({});
+      const listaLivros = await livros.find({}).populate("autor");
       res.status(200).json(listaLivros);
     } catch (erro) {
       next(erro);
     }
   }
-  // formato referencing
-  // static async listarLivros (req, res) {
-  //   try {
-  //     const listaLivros = await livros.find({}).populate("autor").exec();
-  //     res.status(200).json(listaLivros);
-  //   } catch (erro) {
-  //     res.status(500).json({ message: `${erro.message} - falha na requisição` });
-  //   }
-  // };
 
   static async listarLivroPorId(req, res, next) {
     try {
       const id = req.params.id;
-      const livro = await livros.findById(id);
+      const livro = await livros.findById(id).populate("autor");
 
       if (livro !== null) {
         res.status(200).json(livro);
@@ -37,12 +38,16 @@ class LivroController {
     }
   }
 
-  static async buscarLivrosPorEditora(req, res, next) {
-    const editora = req.query.editora;
-
+  static async buscarLivros(req, res, next) {
     try {
-      const livrosPorEditora = await livros.find({ editora });
-      res.status(200).json(livrosPorEditora);
+      const busca = await processaBusca(req.query);
+
+      if (busca) {
+        const resultado = await livros.find(busca).populate("autor");
+        res.status(200).json(resultado);
+      } else {
+        res.status(200).json([]);
+      }
     } catch (erro) {
       next(erro);
     }
@@ -63,8 +68,8 @@ class LivroController {
         const livroCriado = await livros.create(livroCompleto);
 
         res.status(201).json({
-          message: "Livro cadastrado com sucesso.", 
-          livro: livroCriado
+          message: "Livro cadastrado com sucesso.",
+          livro: livroCriado,
         });
       } else {
         next(new NotFoundError("Autor não encontrado na base de dados"));
@@ -104,6 +109,29 @@ class LivroController {
       next(erro);
     }
   }
+}
+
+async function processaBusca(params) {
+  const { editora, titulo, minPaginas, maxPaginas, nomeAutor } = params;
+
+  let busca = {};
+
+  if (editora) busca.editora = editora;
+  if (titulo) busca.titulo = { $regex: titulo, $options: "i" };
+
+  if (minPaginas || maxPaginas) busca.paginas = {};
+  if (minPaginas) busca.paginas.$gte = minPaginas;
+  if (maxPaginas) busca.paginas.$lte = maxPaginas;
+
+  if (nomeAutor) {
+    const autor = await autores.findOne({
+      nome: { $regex: nomeAutor, $options: "i" },
+    });
+
+    if (autor) busca.autor = autor._id;
+    else busca = null;
+  }
+  return busca;
 }
 
 export default LivroController;
