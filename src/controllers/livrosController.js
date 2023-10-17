@@ -16,8 +16,12 @@ class LivroController {
   // formato referencing
   static async listarLivros(req, res, next) {
     try {
-      const listaLivros = await livros.find({}).populate("autor");
-      res.status(200).json(listaLivros);
+      const listaLivros = livros.find({});
+      const countDocuments = await livros.countDocuments();
+
+      req.resultado = listaLivros;
+      req.countDocuments = countDocuments;
+      next();
     } catch (erro) {
       next(erro);
     }
@@ -43,8 +47,13 @@ class LivroController {
       const busca = await processaBusca(req.query);
 
       if (busca) {
-        const resultado = await livros.find(busca).populate("autor");
-        res.status(200).json(resultado);
+        const resultado = livros.find(busca).populate("autor");
+        const countDocuments = await livros.countDocuments();
+
+        req.resultado = resultado;
+        req.countDocuments = countDocuments;
+
+        next();
       } else {
         res.status(200).json([]);
       }

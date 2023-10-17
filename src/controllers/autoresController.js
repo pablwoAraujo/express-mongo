@@ -5,8 +5,12 @@ import livros from "../models/Livros.js";
 class AutoresController {
   static async listarAutores(req, res, next) {
     try {
-      const listaAutores = await autores.find({});
-      res.status(200).json(listaAutores);
+      const listaAutores = autores.find({});
+      const countDocuments = await autores.countDocuments();
+
+      req.resultado = listaAutores;
+      req.countDocuments = countDocuments;
+      next();
     } catch (erro) {
       next(erro);
     }

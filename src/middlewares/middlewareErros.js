@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import BaseError from "../error/BaseError.js";
-import NotFoundError from "../error/NotFoundError.js";
 import BadRequestError from "../error/BadRequestError.js";
 import ValidationError from "../error/ValidationError.js";
 
@@ -10,7 +9,7 @@ function middlewareErros(erro, req, res, next) {
     new ValidationError(erro).respond(res);
   } else if (erro instanceof mongoose.Error.CastError) {
     new BadRequestError().respond(res);
-  } else if (erro instanceof NotFoundError ) {
+  } else if (erro instanceof BaseError ) {
     erro.respond(res);
   } else {
     new BaseError().respond(res);
